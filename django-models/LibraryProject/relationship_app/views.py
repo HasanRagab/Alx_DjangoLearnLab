@@ -1,16 +1,19 @@
 from django.shortcuts import render
-from .models import Book
-
-# Function-based view
-def list_books(request):
-    books = Book.objects.all()
-    return render(request, 'list_books.html', {'books': books})
-
 from django.views.generic import DetailView
-from .models import Library
+from .models import Book, Library
 
-# Class-based view
+# =========================
+# Function-Based View (FBV)
+# =========================
+def list_books(request):
+    books = Book.objects.all()  # استعلام كل الكتب
+    return render(request, 'relationship_app/list_books.html', {'books': books})
+
+
+# =========================
+# Class-Based View (CBV)
+# =========================
 class LibraryDetailView(DetailView):
     model = Library
-    template_name = 'library_detail.html'
-    context_object_name = 'library'  # اسم الكائن في التمبلت
+    template_name = 'relationship_app/library_detail.html'
+    context_object_name = 'library'
