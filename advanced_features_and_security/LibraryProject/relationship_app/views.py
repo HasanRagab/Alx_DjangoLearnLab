@@ -1,3 +1,19 @@
+"""
+Views with Permission-Based Access Control
+
+All book operation views (add, edit, delete, view) are protected with
+@permission_required decorator using raise_exception=True to return
+403 Forbidden for unauthorized access.
+
+Permission Mapping:
+- book_list: relationship_app.can_view
+- add_book: relationship_app.can_create
+- edit_book: relationship_app.can_edit
+- delete_book: relationship_app.can_delete
+
+See PERMISSIONS_GROUPS_README.md for setup and testing instructions.
+"""
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.detail import DetailView
 from .models import Book
@@ -11,8 +27,8 @@ from .models import UserProfile
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import permission_required
 
-# ✅ View to add a book
-@permission_required('relationship_app.can_add_book')
+# ✅ View to add a book - requires can_create permission
+@permission_required('relationship_app.can_create', raise_exception=True)
 def add_book(request):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -22,8 +38,8 @@ def add_book(request):
         return redirect('list_books')
     return render(request, 'relationship_app/add_book.html')
 
-# ✅ View to edit a book
-@permission_required('relationship_app.can_change_book')
+# ✅ View to edit a book - requires can_edit permission
+@permission_required('relationship_app.can_edit', raise_exception=True)
 def edit_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
@@ -34,8 +50,8 @@ def edit_book(request, pk):
         return redirect('list_books')
     return render(request, 'relationship_app/edit_book.html', {'book': book})
 
-# ✅ View to delete a book
-@permission_required('relationship_app.can_delete_book')
+# ✅ View to delete a book - requires can_delete permission
+@permission_required('relationship_app.can_delete', raise_exception=True)
 def delete_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
@@ -43,10 +59,11 @@ def delete_book(request, pk):
         return redirect('list_books')
     return render(request, 'relationship_app/delete_book.html', {'book': book})
 
-# ✅ View to list all books
+# ✅ View to list all books - requires can_view permission
+@permission_required('relationship_app.can_view', raise_exception=True)
 def book_list(request):
     books = Book.objects.all()
-    return render(request, 'relationship_app/book_list.html', {'books': books})
+    return render(request, 'relationship_app/list_books.html', {'books': books})
 
 
 # ✅ Check functions for each role

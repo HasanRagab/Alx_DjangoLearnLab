@@ -1,9 +1,33 @@
+"""
+Relationship App Models with Permissions and Groups
+
+This module defines the Book model with custom permissions for access control.
+Permissions are enforced in views using @permission_required decorator.
+
+Groups:
+- Viewers: can_view only
+- Editors: can_view, can_create, can_edit
+- Admins: can_view, can_create, can_edit, can_delete
+
+See PERMISSIONS_GROUPS_README.md for full documentation.
+"""
+
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 class Book(models.Model):
+    """
+    Book model with custom permissions for granular access control.
+    
+    Custom Permissions:
+    - can_view: User can view the list of books
+    - can_create: User can create new book entries
+    - can_edit: User can edit existing book entries
+    - can_delete: User can delete book entries
+    """
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
     published_date = models.DateField()
@@ -12,11 +36,15 @@ class Book(models.Model):
         return self.title
 
     class Meta:
-        # Custom permissions to control who can add/change/delete Book instances
+        """
+        Custom permissions for Book model.
+        Permissions are checked in views using @permission_required decorator.
+        """
         permissions = [
-            ("can_add_book", "Can add a new book"),
-            ("can_change_book", "Can edit an existing book"),
-            ("can_delete_book", "Can delete a book"),
+            ("can_view", "Can view book"),
+            ("can_create", "Can create book"),
+            ("can_edit", "Can edit book"),
+            ("can_delete", "Can delete book"),
         ]
 
 class UserProfile(models.Model):
