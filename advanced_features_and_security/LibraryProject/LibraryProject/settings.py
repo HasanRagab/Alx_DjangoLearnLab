@@ -24,9 +24,10 @@ SECRET_KEY = 'django-insecure-&v2&zajgxscurg0c(yy3rx7@d-8iufn4mfiep(10@wp@59_)v+
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG should be False in production; the final DEBUG setting near the security
+# section below controls the production value. Removed duplicate DEBUG=True.
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['example.com', 'www.example.com', '127.0.0.1']  # replace with your real domains
 
 
 # Application definition
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'csp.middleware.CSPMiddleware',  # Content Security Policy middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -141,11 +143,24 @@ LOGOUT_REDIRECT_URL = '/login/'
 # SECURITY BEST PRACTICES
 # ------------------------------
 
+# If Django is behind a proxy (like Nginx), trust the X-Forwarded-Proto header
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 DEBUG = False  # Disable in production
 
 # Browser security headers
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True
+
+# HTTP Strict Transport Security
+SECURE_HSTS_SECONDS = 31536000  # سنة واحدة بالثواني
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # يشمل كل النطاقات الفرعية
+SECURE_HSTS_PRELOAD = True  # للسماح بالتحميل المسبق في المتصفح
+
 
 # Protect against clickjacking
 X_FRAME_OPTIONS = 'DENY'
@@ -159,8 +174,4 @@ CSP_DEFAULT_SRC = ("'self'",)
 CSP_STYLE_SRC = ("'self'", "fonts.googleapis.com")
 CSP_SCRIPT_SRC = ("'self'",)
 
-# Add CSP middleware
-if 'csp.middleware.CSPMiddleware' not in MIDDLEWARE:
-    MIDDLEWARE += [
-        'csp.middleware.CSPMiddleware',
-    ]
+# CSP middleware included above in the MIDDLEWARE list
