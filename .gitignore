@@ -53,3 +53,6 @@ htmlcov/
 pytest_cache/
 .tox/
 .nox/
+
+# Ignore advanced_features_and_security project folder
+advanced_features_and_security/
